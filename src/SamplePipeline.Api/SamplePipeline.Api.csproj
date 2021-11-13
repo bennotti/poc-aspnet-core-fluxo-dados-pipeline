@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile></DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Core.Pipelines\Core.Pipelines.csproj" />
+    <ProjectReference Include="..\Infra.Pipelines\Infra.Pipelines.csproj" />
+    <ProjectReference Include="..\SamplePipeline\SamplePipeline.csproj" />
+  </ItemGroup>
+
+
+</Project>
