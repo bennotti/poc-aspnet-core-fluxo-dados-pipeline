@@ -1,5 +1,7 @@
 ﻿using Core.Pipelines.Interfaces;
+using Core.Pipelines.ViewModels.Interfaces;
 using Infra.Pipelines;
+using Infra.Pipelines.Extensions;
 using Microsoft.Extensions.Caching.Memory;
 using Newtonsoft.Json;
 using SamplePipeline.Core.Dto.WeatherForecast;
@@ -17,7 +19,7 @@ namespace SamplePipeline.Infra.Pipeline.Steps
         {
             _cache = cache;
         }
-        public override IEnumerable<IPipelinePackage> Execute(IPipelinePackage package)
+        public override IEnumerable<IPipelineStepResponseVM> Execute(IPipelinePackage package)
         {
             string jsonString;
             if (_cache.TryGetValue("wheather-forecast", out jsonString))
@@ -26,11 +28,11 @@ namespace SamplePipeline.Infra.Pipeline.Steps
                 
                 package.LockPackage();
 
-                yield return package;
+                yield return package.ToPipelineStepResponse();
                 yield break;
             }
 
-            yield return package;
+            yield return package.ToPipelineStepResponse();
         }
     }
 }

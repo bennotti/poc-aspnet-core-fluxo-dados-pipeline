@@ -1,4 +1,5 @@
 ﻿using Core.Pipelines.Interfaces;
+using Core.Pipelines.ViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -51,6 +52,6 @@ namespace Infra.Pipelines
             }
         }
 
-        public abstract IEnumerable<IPipelinePackage> Execute(IPipelinePackage package);
+        public abstract IEnumerable<IPipelineStepResponseVM> Execute(IPipelinePackage package);
     }
 }

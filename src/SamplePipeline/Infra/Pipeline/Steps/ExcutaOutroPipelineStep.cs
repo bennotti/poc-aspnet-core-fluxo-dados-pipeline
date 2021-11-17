@@ -1,5 +1,7 @@
 ﻿using Core.Pipelines.Interfaces;
+using Core.Pipelines.ViewModels.Interfaces;
 using Infra.Pipelines;
+using Infra.Pipelines.Extensions;
 using SamplePipeline.Core.Dto.WeatherForecast;
 using SamplePipeline.Core.Pipeline.Interfaces;
 using SamplePipeline.Core.Services.Interfaces;
@@ -24,14 +26,15 @@ namespace SamplePipeline.Infra.Pipeline.Steps {
 
         public IList<Type> OutputTypeRequiredContents => new List<Type>();
 
-        public IEnumerable<IPipelinePackage> Execute(IPipelinePackage package)
+        public IEnumerable<IPipelineStepResponseVM> Execute(IPipelinePackage package)
         {
             IPipeline pipeline = _pipelineBuilder.Build(package)
-                .AddStep<IAcaoExcutaOutroPipelineStep>();
+                .AddEventStep<IAcaoExecutaEventoPipelineEventStep>()
+                .AddStep<IAcaoExecutaOutroPipelineStep>();
 
-            package = pipeline.Execute(false).GetAwaiter().GetResult();
+            package = pipeline.Execute(lockWhenFinish: false).GetAwaiter().GetResult();
 
-            yield return package;
+            yield return package.ToPipelineStepResponse();
         }
     }
 }

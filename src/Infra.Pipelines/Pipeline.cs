@@ -1,4 +1,6 @@
-﻿using Core.Pipelines.Interfaces;
+﻿using Core.Pipelines.Extensions;
+using Core.Pipelines.Interfaces;
+using Core.Pipelines.ViewModels.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,7 @@ namespace Infra.Pipelines
     public sealed class Pipeline : IPipeline
     {
         private readonly IList<IPipelineStep> _steps;
+        private readonly IList<IPipelineEventStep> _events;
         private readonly IServiceProvider _serviceProvider;
 
         public IList<string> RequiredContents => new List<string>();
@@ -21,6 +24,7 @@ namespace Infra.Pipelines
         {
             _serviceProvider = serviceProvider;
             _steps = new List<IPipelineStep>();
+            _events = new List<IPipelineEventStep>();
             _package = new PipelinePackage();
         }
 
@@ -28,6 +32,7 @@ namespace Infra.Pipelines
         {
             _serviceProvider = serviceProvider;
             _steps = new List<IPipelineStep>();
+            _events = new List<IPipelineEventStep>();
             _package = package;
         }
 
@@ -84,6 +89,13 @@ namespace Infra.Pipelines
             return this.AddStepAsync<T>().GetAwaiter().GetResult();
         }
 
+        public IPipeline AddEventStep<T>() where T : IPipelineEventStep
+        {
+            _events.Add(GetService<T>());
+
+            return this;
+        }
+
         public async Task ValidarOutputRequiredContent<T>(T step, IPipelinePackage package) where T : IPipelineStep
         {
             if (step.OutputRequiredContents == null) return;
@@ -98,19 +110,37 @@ namespace Infra.Pipelines
             await Task.CompletedTask;
         }
 
+        private async Task ProcessStepBefore(IPipelineStepResponseVM stepResponse)
+        {
+            if (!stepResponse.IsRunStepBeforeContinue) return;
+            IPipelineStep stepBefore = _events.FirstOrDefault(p =>
+                p.GetType().HasType(stepResponse.StepToRunType)
+            );
+
+            if (stepBefore == null) return;
+
+            await ProcessExecute(stepBefore);
+        }
+
+        private async Task ProcessExecute(IPipelineStep step)
+        {
+            foreach (IPipelineStepResponseVM stepResponse in step.Execute(_package))
+            {
+                _package = stepResponse.Package;
+                if (_package.IsLocked)
+                {
+                    break;
+                }
+                await ValidarOutputRequiredContent(step, _package);
+                await ProcessStepBefore(stepResponse);
+            }
+        }
+
         private async Task ProcessSteps(bool lockWhenFinish)
         {
             foreach (IPipelineStep step in _steps.Where(p => p != null))
             {
-                foreach (IPipelinePackage pack in step.Execute(_package))
-                {
-                    await ValidarOutputRequiredContent(step, pack);
-                    _package = pack;
-                    if (_package.IsLocked)
-                    {
-                        break;
-                    }
-                }
+                await ProcessExecute(step);
                 if (_package.IsLocked) break;
             }
             if (!_package.IsLocked && lockWhenFinish) _package.LockPackage(message: "Pipeline Processada!");

@@ -1,5 +1,7 @@
 ﻿using Core.Pipelines.Interfaces;
+using Core.Pipelines.ViewModels.Interfaces;
 using Infra.Pipelines;
+using Infra.Pipelines.Extensions;
 using SamplePipeline.Core.Dto.WeatherForecast;
 using SamplePipeline.Core.Pipeline.Interfaces;
 using SamplePipeline.Core.Services.Interfaces;
@@ -9,13 +11,13 @@ using System.Text;
 
 namespace SamplePipeline.Infra.Pipeline.Steps
 {
-    public class AcaoExcutaOutroPipelineStep : AbstractPipelineStep, IAcaoExcutaOutroPipelineStep
+    public class AcaoExecutaOutroPipelineStep : AbstractPipelineStep, IAcaoExecutaOutroPipelineStep
     {
-        public override IEnumerable<IPipelinePackage> Execute(IPipelinePackage package)
+        public override IEnumerable<IPipelineStepResponseVM> Execute(IPipelinePackage package)
         {
             package.AddContent("teste", "valor");
 
-            yield return package;
+            yield return package.ToPipelineStepResponse<IAcaoExecutaEventoPipelineEventStep>();
         }
     }
 }

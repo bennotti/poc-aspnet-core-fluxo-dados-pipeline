@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SamplePipeline.Core.Pipeline.Interfaces
 {
-    public interface IAcaoExcutaOutroPipelineStep : IPipelineStep
+    public interface IAcaoExecutaEventoPipelineEventStep : IPipelineEventStep
     {
     }
 }

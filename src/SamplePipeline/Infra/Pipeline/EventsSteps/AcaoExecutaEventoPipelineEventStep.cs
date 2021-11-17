@@ -11,20 +11,13 @@ using System.Text;
 
 namespace SamplePipeline.Infra.Pipeline.Steps
 {
-    public class ObterWheatherPipelineStep : AbstractPipelineStep, IObterWheatherPipelineStep
+    public class AcaoExecutaEventoPipelineEventStep : AbstractPipelineStep, IAcaoExecutaEventoPipelineEventStep
     {
-        private readonly IWeatherForecastService _service;
-        public ObterWheatherPipelineStep(IWeatherForecastService service)
-        {
-            _service = service;
-        }
         public override IEnumerable<IPipelineStepResponseVM> Execute(IPipelinePackage package)
         {
-            ListWheatherForecastRequestDto request = package.GetContent<ListWheatherForecastRequestDto>();
-
-            ListWheatherForecastResponseDto response = _service.Obter(request).GetAwaiter().GetResult();
-
-            package.AddContent(response);
+            Console.WriteLine("=========================================");
+            Console.WriteLine($"Executou: {nameof(AcaoExecutaEventoPipelineEventStep)}");
+            Console.WriteLine("=========================================");
 
             yield return package.ToPipelineStepResponse();
         }

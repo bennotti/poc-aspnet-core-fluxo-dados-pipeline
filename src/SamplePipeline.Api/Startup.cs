@@ -48,7 +48,8 @@ namespace SamplePipeline.Api
             services.AddTransient<ICacheObterWheatherPipelineStep, CacheObterWheatherPipelineStep>();
             services.AddTransient<ICacheSalvarWheatherPipelineStep, CacheSalvarWheatherPipelineStep>();
             services.AddTransient<IExcutaOutroPipelineStep, ExcutaOutroPipelineStep>();
-            services.AddTransient<IAcaoExcutaOutroPipelineStep, AcaoExcutaOutroPipelineStep>();
+            services.AddTransient<IAcaoExecutaOutroPipelineStep, AcaoExecutaOutroPipelineStep>();
+            services.AddTransient<IAcaoExecutaEventoPipelineEventStep, AcaoExecutaEventoPipelineEventStep>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
